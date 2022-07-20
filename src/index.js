@@ -1,4 +1,3 @@
-const { v4: randomUuid } = require("uuid")
 const express = require("express")
 
 const app = express()
@@ -9,20 +8,19 @@ const DEFAULT_COLLECTION = [
   {
     name: "Mona Lisa",
     author: "Leonardo da Vinci",
-    id: randomUuid(),
+    id: 1,
     bids: [],
   },
   {
     name: "Starry Night",
     author: "Vincent van Gogh",
-    id: randomUuid(),
+    id: 2,
     bids: [],
-    id2: randomUuid()
   },
   {
     name: "Guernica",
     author: "Pablo Picasso",
-    id: randomUuid(),
+    id: 3,
     bids: [],
   },
 ]
@@ -31,17 +29,28 @@ const DEFAULT_USERS = [
   {
     name: "John Richman",
     cpf: "11144477735",
-    id: randomUuid(),
-    transactions: []
+    id: 1,
+    transactions: [
+      {
+        value: 30000,
+        description: 'deposit',
+      },
+      {
+        value:-4000,
+        description: 'bid',
+        artId: 1
+      }]
   },
   {
     name: "Angela Christina",
     cpf: "25916251661",
-    id: randomUuid(),
+    id: 2,
     transactions: []
   },
 ]
 
+let nextUserId = 3
+let nextArtId = 4
 app.get("/arts", (request, response) => {
     return response.json(DEFAULT_COLLECTION)
   }
@@ -76,12 +85,40 @@ app.post("/users", (request, response) => {
 
   DEFAULT_USERS.push({ name: name,
                        cpf: cpf,
-                       id: randomUuid(),
+                       id: nextUserId,
                        transactions: [],
                       })
 
+  nextUserId++
   response.status(201).send()
 
 })
 
-app.listen(3030)
+app.get("/users/:id/budget", (request, response) => {
+  function sumTransactions(transactions){
+    sum = 0
+
+    if (transactions === []) {
+      return sum
+    }
+
+    transactions.forEach(transaction => {
+      sum += transaction.value
+    });
+
+    return sum
+  }
+
+  const { id } = request.params
+
+  const user = DEFAULT_USERS.find(user => user.id === parseInt(id))
+
+  return response.json({
+    budget: sumTransactions(user.transactions)
+  })
+})
+
+
+// app.listen(3001)
+
+module.exports = app
