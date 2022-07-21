@@ -28,7 +28,7 @@ const DEFAULT_COLLECTION = [
 const DEFAULT_USERS = [
   {
     name: "John Richman",
-    cpf: "11144477735",
+    email: "john.richman@email.com",
     id: 1,
     transactions: [
       {
@@ -39,11 +39,12 @@ const DEFAULT_USERS = [
         value:-4000,
         description: 'bid',
         artId: 1
-      }]
+      }
+    ]
   },
   {
     name: "Angela Christina",
-    cpf: "25916251661",
+    email: "angela.christina@email.com",
     id: 2,
     transactions: []
   },
@@ -74,23 +75,31 @@ app.get("/users", (request, response) => {
   return response.json(DEFAULT_USERS)
 })
 
-app.post("/users", (request, response) => {
-  const { cpf, name } = request.body
+app.get("/users/:id", (request, response) => {
+  const { id } = request.params
+  const user = DEFAULT_USERS.find(user => user.id === parseInt(id))
+  return (!user ?
+            response.status(404).json({error: "Unexistent user"}) :
+            response.json(user))
+})
 
-  const isUserAlreadyRegistered = DEFAULT_USERS.some((user) => user.cpf === cpf )
+app.post("/users", (request, response) => {
+  const { email, name } = request.body
+
+  const isUserAlreadyRegistered = DEFAULT_USERS.some((user) => user.email === email.toLowerCase() )
 
   if(isUserAlreadyRegistered) {
     return response.status(400).json({error: "User is already registered"})
   }
 
   DEFAULT_USERS.push({ name: name,
-                       cpf: cpf,
+                       email: email.toLowerCase(),
                        id: nextUserId,
                        transactions: [],
                       })
 
   nextUserId++
-  response.status(201).send()
+  response.status(201).json({success: "User registered :)"})
 
 })
 
@@ -119,6 +128,6 @@ app.get("/users/:id/budget", (request, response) => {
 })
 
 
-// app.listen(3001)
+// app.listen(3030)
 
 module.exports = app
