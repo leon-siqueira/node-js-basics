@@ -69,6 +69,7 @@ describe('\n/users\n', () => {
     .send({
       name: "Jane Doe",
       email: "jane.doe@email.com",
+      pwd: "senha1234"
     })
     .expect(201)
   })
@@ -80,6 +81,7 @@ describe('\n/users\n', () => {
     .send({
       name: "John A. Richman",
       email: "john.ricHman@email.com",
+      pwd: "senha1234"
     })
     .expect(400)
     .then((response) => {
